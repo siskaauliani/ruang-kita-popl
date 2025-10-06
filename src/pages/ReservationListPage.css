@@ -1,0 +1,47 @@
+.page-content {
+  padding: 20px 40px;
+}
+
+.page-content h1 {
+  margin-bottom: 20px;
+}
+
+.table-container {
+  overflow-x: auto;
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.reservation-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.reservation-table th, .reservation-table td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.reservation-table thead th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+}
+
+.reservation-table tbody tr:hover {
+  background-color: #f1f1f1;
+}
+
+.status-badge {
+  padding: 5px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  color: white;
+  font-weight: 500;
+}
+
+.status-approved { background-color: #28a745; }
+.status-rejected { background-color: #dc3545; }
+.status-pending { background-color: #ffc107; color: #333 }
