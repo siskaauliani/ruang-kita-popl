@@ -2,14 +2,15 @@
 import React from "react";
 import Navbar from "../components/Navbar";
 import { useReservations } from "../context/ReservationContext";
-import { AuthContext } from "../context/AuthContext";
+import { useAuth } from "../context/AuthContext";
 import { users, rooms } from "../data/mockData";
 import "./ReservationListPage.css";
 import { useContext } from "react";
 
 const ReservationListPage = () => {
   const { reservations } = useReservations(); // dari ReservationContext
-  const { user } = useContext(AuthContext);   // user login
+const { user } = useAuth();
+
 
   // Filter: admin lihat semua, user lihat punya sendiri
   const filteredReservations =
