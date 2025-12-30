@@ -1,38 +1,58 @@
-// src/context/AuthContext.js
-import React, { createContext, useState, useContext } from 'react';
-import { users } from '../data/mockData'; // Import data user kita
+// src/context/AuthContext.jsx
+import React, { createContext, useState, useContext } from "react";
+import { users } from "../data/mockData";
 
 // 1. Membuat Context
 const AuthContext = createContext(null);
 
-// 2. Membuat Provider (Komponen yang akan menyediakan data)
+// 2. Provider
 export const AuthProvider = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState(null); // Awalnya tidak ada user yang login
+  // Ambil data user dari localStorage saat app pertama kali load
+  const [currentUser, setCurrentUser] = useState(() => {
+    const savedUser = localStorage.getItem("currentUser");
+    return savedUser ? JSON.parse(savedUser) : null;
+  });
 
+  // Fungsi login
   const login = (email, password) => {
-    const user = users.find(u => u.email === email && u.password === password);
+    console.info("[AUTH] Login attempt:", email);
+
+    const user = users.find(
+      (u) => u.email === email && u.password === password
+    );
+
     if (user) {
-      setCurrentUser(user); // Jika user ditemukan, simpan datanya di state
-      return true; // Login berhasil
+      setCurrentUser(user);
+      localStorage.setItem("currentUser", JSON.stringify(user));
+      console.info("[AUTH] Login success:", user.email);
+      return true;
     }
-    return false; // Login gagal
+
+    console.error("[AUTH] Login failed:", email);
+    return false;
   };
 
+  // Fungsi logout
   const logout = () => {
-    setCurrentUser(null); // Hapus data user dari state
+    console.info("[AUTH] User logout");
+    setCurrentUser(null);
+    localStorage.removeItem("currentUser");
   };
 
-  // Nilai yang akan dibagikan ke seluruh aplikasi
   const value = {
     currentUser,
     login,
     logout,
   };
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>
+  );
 };
 
-// 3. Membuat Custom Hook untuk mempermudah penggunaan context
+// 3. Custom Hook
 export const useAuth = () => {
   return useContext(AuthContext);
 };
