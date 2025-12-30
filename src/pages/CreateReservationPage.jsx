@@ -1,53 +1,73 @@
 // src/pages/CreateReservationPage.jsx
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import Navbar from '../components/Navbar';
-import { rooms } from '../data/mockData';
-import { useAuth } from '../context/AuthContext'; // <-- Import Auth Context
-import { useReservations } from '../context/ReservationContext'; // <-- Import Reservation Context
-import './CreateReservationPage.css';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import Navbar from "../components/Navbar";
+import { rooms } from "../data/mockData";
+import { useAuth } from "../context/AuthContext";
+import { useReservations } from "../context/ReservationContext";
+import "./CreateReservationPage.css";
 
 const CreateReservationPage = () => {
-  const { currentUser } = useAuth(); // Ambil data user yang login
-  const { addReservation } = useReservations(); // Ambil fungsi addReservation
+  const { currentUser } = useAuth();
+  const { reservations, addReservation } = useReservations();
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    roomId: '',
-    purpose: '',
-    date: '',
-    startTime: '',
-    endTime: '',
+    roomId: "",
+    purpose: "",
+    date: "",
+    startTime: "",
+    endTime: "",
   });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Validasi: Pastikan user sudah login
+
+    // 1️⃣ Cek login
     if (!currentUser) {
-      alert('Anda harus login terlebih dahulu untuk membuat reservasi!');
-      navigate('/login');
+      alert("Anda harus login terlebih dahulu!");
+      navigate("/login");
       return;
     }
 
-    // Validasi: Pastikan semua field terisi
-    if (!formData.roomId || !formData.date || !formData.startTime || !formData.endTime || !formData.purpose) {
-      alert('Semua field wajib diisi!');
+    // 2️⃣ Cek field wajib
+    const { roomId, date, startTime, endTime, purpose } = formData;
+    if (!roomId || !date || !startTime || !endTime || !purpose) {
+      alert("Semua field wajib diisi!");
       return;
     }
 
-    // Panggil fungsi addReservation dari context
+    // 3️⃣ CEK JADWAL BENTROK
+    const isConflict = reservations.some(
+      (r) =>
+        String(r.roomId) === String(roomId) &&
+        r.date === date &&
+        r.status !== "Ditolak" &&
+        !(
+          endTime <= r.startTime ||
+          startTime >= r.endTime
+        )
+    );
+
+    if (isConflict) {
+      alert("Jadwal bentrok! Silakan pilih waktu lain.");
+      return;
+    }
+
+    // 4️⃣ Tambah reservasi
     addReservation({
       ...formData,
-      userId: currentUser.id, // Tambahkan ID user yang sedang login
+      userId: currentUser.id,
+      status: "Menunggu",
     });
 
-    alert('Permintaan reservasi berhasil dikirim!');
-    navigate('/reservasi'); // Langsung arahkan ke halaman list reservasi
+    alert("Permintaan reservasi berhasil dikirim!");
+    navigate("/reservasi");
   };
 
   return (
@@ -56,36 +76,74 @@ const CreateReservationPage = () => {
       <div className="page-container">
         <div className="form-card">
           <h2>Formulir Reservasi Ruang</h2>
+
           <form onSubmit={handleSubmit}>
-            {/* ... (isi form tidak berubah) ... */}
             <div className="input-group">
-              <label htmlFor="roomId">Pilih Ruang</label>
-              <select name="roomId" id="roomId" value={formData.roomId} onChange={handleChange} required>
-                <option value="" disabled>-- Pilih Ruangan --</option>
-                {rooms.map(room => (
-                  <option key={room.id} value={room.id}>{room.name}</option>
+              <label>Pilih Ruang</label>
+              <select
+                name="roomId"
+                value={formData.roomId}
+                onChange={handleChange}
+                required
+              >
+                <option value="">-- Pilih Ruangan --</option>
+                {rooms.map((room) => (
+                  <option key={room.id} value={room.id}>
+                    {room.name}
+                  </option>
                 ))}
               </select>
             </div>
+
             <div className="input-group">
-              <label htmlFor="date">Tanggal</label>
-              <input type="date" name="date" id="date" value={formData.date} onChange={handleChange} required />
+              <label>Tanggal</label>
+              <input
+                type="date"
+                name="date"
+                value={formData.date}
+                onChange={handleChange}
+                required
+              />
             </div>
+
             <div className="time-group">
               <div className="input-group">
-                <label htmlFor="startTime">Jam Mulai</label>
-                <input type="time" name="startTime" id="startTime" value={formData.startTime} onChange={handleChange} required />
+                <label>Jam Mulai</label>
+                <input
+                  type="time"
+                  name="startTime"
+                  value={formData.startTime}
+                  onChange={handleChange}
+                  required
+                />
               </div>
+
               <div className="input-group">
-                <label htmlFor="endTime">Jam Selesai</label>
-                <input type="time" name="endTime" id="endTime" value={formData.endTime} onChange={handleChange} required />
+                <label>Jam Selesai</label>
+                <input
+                  type="time"
+                  name="endTime"
+                  value={formData.endTime}
+                  onChange={handleChange}
+                  required
+                />
               </div>
             </div>
+
             <div className="input-group">
-              <label htmlFor="purpose">Tujuan</label>
-              <textarea name="purpose" id="purpose" rows="3" value={formData.purpose} onChange={handleChange} required></textarea>
+              <label>Tujuan</label>
+              <textarea
+                name="purpose"
+                rows="3"
+                value={formData.purpose}
+                onChange={handleChange}
+                required
+              />
             </div>
-            <button type="submit" className="submit-button">Kirim Permintaan</button>
+
+            <button type="submit" className="submit-button">
+              Kirim Permintaan
+            </button>
           </form>
         </div>
       </div>

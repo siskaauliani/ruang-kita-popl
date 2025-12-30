@@ -1,46 +1,77 @@
 // src/context/ReservationContext.js
-import React, { createContext, useState, useContext } from 'react';
-import { reservations as initialReservations } from '../data/mockData';
+import React, {
+  createContext,
+  useState,
+  useContext,
+  useEffect,
+} from "react";
+import { reservations as initialReservations } from "../data/mockData";
+
+// Logger sederhana
+const logActivity = (msg, data) => {
+  console.log(`[RUANGKITA LOG] ${msg}`, data);
+};
 
 // 1. Membuat Context
 const ReservationContext = createContext();
 
-// 2. Membuat Provider
+// 2. Provider
 export const ReservationProvider = ({ children }) => {
-  // State untuk menyimpan daftar reservasi. Diisi dengan data awal dari mockData.
-  const [reservations, setReservations] = useState(initialReservations);
+  const [reservations, setReservations] = useState(() => {
+    const stored = localStorage.getItem("reservations");
+    return stored ? JSON.parse(stored) : initialReservations;
+  });
 
-  // Fungsi untuk menambah reservasi baru
+  // Simpan ke localStorage
+  useEffect(() => {
+    localStorage.setItem("reservations", JSON.stringify(reservations));
+  }, [reservations]);
+
+  // Tambah reservasi
   const addReservation = (newReservationData) => {
-    // Membuat objek reservasi baru yang lengkap
     const newReservation = {
       ...newReservationData,
-      id: reservations.length + 1, // Buat ID baru yang simpel
-      status: 'Menunggu', // Status default untuk reservasi baru
+      id: Date.now(),
+      status: "Menunggu",
     };
-    
-    // Update state dengan menambahkan reservasi baru ke daftar yang sudah ada
-    setReservations(prevReservations => [...prevReservations, newReservation]);
+
+    setReservations((prev) => [...prev, newReservation]);
+
+    // ✅ LOG DITARUH DI SINI
+    logActivity("Reservasi dibuat", {
+      userId: newReservation.userId,
+      roomId: newReservation.roomId,
+      date: newReservation.date,
+      startTime: newReservation.startTime,
+      endTime: newReservation.endTime,
+      status: newReservation.status,
+    });
   };
 
-  // Fungsi untuk update status (dipakai di Admin Panel)
+  // Update status (Admin)
   const updateReservationStatus = (reservationId, newStatus) => {
-    setReservations(prevReservations =>
-      prevReservations.map(res =>
-        res.id === reservationId ? { ...res, status: newStatus } : res
+    setReservations((prev) =>
+      prev.map((res) =>
+        res.id === reservationId
+          ? { ...res, status: newStatus }
+          : res
       )
     );
-  };
-  
-  // Data yang akan dibagikan
-  const value = {
-    reservations,
-    addReservation,
-    updateReservationStatus,
+
+    logActivity("Status reservasi diubah", {
+      reservationId,
+      newStatus,
+    });
   };
 
   return (
-    <ReservationContext.Provider value={value}>
+    <ReservationContext.Provider
+      value={{
+        reservations,
+        addReservation,
+        updateReservationStatus,
+      }}
+    >
       {children}
     </ReservationContext.Provider>
   );
