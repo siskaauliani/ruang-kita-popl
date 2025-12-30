@@ -1,7 +1,6 @@
 .page-container {
   min-height: 100vh;
-  background-image:
-    url("/images/login-bg.jpg");
+  background-image: url("/images/login-bg.jpg");
   background-size: cover;
   background-position: center;
   display: flex;
@@ -9,58 +8,98 @@
   align-items: center;
 }
 
-/* Card Login */
+/* Login Card */
 .auth-card {
-  background: rgba(255, 255, 255, 0.95);
-  padding: 30px;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
+  padding: 36px 32px;
   width: 100%;
-  max-width: 380px;
-  border-radius: 14px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  max-width: 400px;
+
+  border-radius: 18px;
+  box-shadow:
+    0 15px 35px rgba(0, 0, 0, 0.25);
+
+  animation: fadeIn 0.6s ease;
+}
+
+/* Animasi masuk */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Judul */
 .auth-card h2 {
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
+  font-size: 24px;
+  font-weight: 600;
+  color: #1f2937;
 }
 
-/* Input */
+/* Input group */
 .input-group {
-  margin-bottom: 15px;
+  margin-bottom: 18px;
 }
 
 .input-group label {
   display: block;
-  margin-bottom: 5px;
+  margin-bottom: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
 }
 
 .input-group input {
   width: 100%;
-  padding: 10px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+  font-size: 14px;
+  transition: border 0.2s, box-shadow 0.2s;
+}
+
+.input-group input:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
 }
 
 /* Button */
 .auth-button {
   width: 100%;
-  padding: 10px;
-  background: #2563eb;
+  padding: 12px;
+  margin-top: 8px;
+
+  background: linear-gradient(135deg, #2563eb, #1e40af);
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
+
+  font-size: 15px;
+  font-weight: 600;
   cursor: pointer;
-  margin-top: 10px;
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .auth-button:hover {
-  background: #1e40af;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.4);
 }
 
 /* Error */
 .error-message {
-  color: red;
+  color: #dc2626;
   text-align: center;
-  margin-bottom: 10px;
+  margin-bottom: 14px;
+  font-size: 14px;
 }
